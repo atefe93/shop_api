@@ -3,6 +3,8 @@
 namespace Tests\Unit;
 
 use App\Models\Province;
+use Database\Factories\ProvinceFactory;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 use App\Models\User;
@@ -13,6 +15,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class UserTest extends TestCase
 {
+
 
     public function testRequiredFieldsForRegistration()
     {
@@ -37,17 +40,8 @@ class UserTest extends TestCase
     }
     public function testRepeatPassword()
     {
-        $userData = [
-            "name" => "John Doe",
-            "email" => "doe@example.com",
-            "password" => "demo12345",
-            "c_password" =>"44444444",
-            "address" => "fvhgcfggfdfg",
-            "cellphone" => "09195264875",
-            "postal_code" => "5264875",
-            "province_id" => 1,
-            "city_id" => 1,
-        ];
+        $userData = $this->getArrayUserData();
+        $userData['c_password']=111111;
 
         $this->json('POST', 'api/register', $userData, ['Accept' => 'application/json'])
             ->assertStatus(422)
@@ -61,26 +55,7 @@ class UserTest extends TestCase
     }
     public function testSuccessfulRegistration()
     {
-        $province= Province::create([
-            "name" => "alborz",
-
-        ]);
-        $city= City::create([
-            "province_id" => $province->id,
-            "name" => "karaj",
-
-        ]);
-        $userData = [
-            "name" => "ohn Doe",
-            "email" => "oeggllg@example.com",
-            "password" => "demo12345",
-            "c_password" =>"demo12345",
-            "address" => "fvhgcfggfdfg",
-            "cellphone" => "09195264875",
-            "postal_code" => "5264875",
-            "province_id" => $province->id,
-            "city_id" => $city->id,
-        ];
+        $userData = $this->getArrayUserData();
 
 
         $this->json('POST', 'api/register', $userData, ['Accept' => 'application/json'])
@@ -124,28 +99,10 @@ class UserTest extends TestCase
     }
     public function testSuccessfulLogin()
     {
-        $province= Province::create([
-            "name" => "alborz",
-
-        ]);
-        $city= City::create([
-            "province_id" => $province->id,
-            "name" => "karaj",
-
-        ]);
-        $user = User::create([
-            'name'=>'ali',
-            'email' => 'sample@test.com',
-            'password' => bcrypt('sample123'),
-            "address" => "fvhgcfggfdfg",
-            "cellphone" => "09195264875",
-            "postal_code" => "5264875",
-            "province_id" => $province->id,
-            "city_id" => $city->id,
-        ]);
+        $user = User::factory()->create();
 
 
-        $loginData = ['email' => 'sample@test.com', 'password' => 'sample123'];
+        $loginData = ['email' => $user->email, 'password' => 'password'];
 
         $this->json('POST', 'api/login', $loginData, ['Accept' => 'application/json'])
             ->assertStatus(200)
@@ -170,11 +127,38 @@ class UserTest extends TestCase
 
 
             ]);
+//        Sanctum::actingAs(
+//            $user
+//        );
 
-        $this->assertAuthenticated();
+
+//        $this->assertAuthenticated();
     }
 
 
+
+
+
+
+
+
+    private function getArrayUserData()
+    {
+        $province = Province::factory()->create();
+        $city = City::factory()->create();
+        $userData = [
+            "name" => "ohn Doe",
+            "email" => "oeggllg@example.com",
+            "password" => "demo12345",
+            "c_password" => "demo12345",
+            "address" => "fvhgcfggfdfg",
+            "cellphone" => "09195264875",
+            "postal_code" => "5264875",
+            "province_id" => $province->id,
+            "city_id" => $city->id,
+        ];
+        return $userData;
+    }
 
 
 

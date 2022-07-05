@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\City;
+use App\Models\Province;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CityFactory extends Factory
@@ -11,10 +13,12 @@ class CityFactory extends Factory
      *
      * @return array
      */
+    protected $model = City::class;
     public function definition()
     {
         return [
             'name' => $this->faker->name(),
+            'province_id' => Province::factory(),
         ];
     }
 }
