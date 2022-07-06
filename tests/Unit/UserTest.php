@@ -16,6 +16,27 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class UserTest extends TestCase
 {
 
+    private $UserStructure=[
+        "status",
+        "message",
+        "data"=>[
+            "user" => [
+                'id',
+                'name',
+                'email',
+                'address',
+                'cellphone',
+                'postal_code',
+                'province_id',
+                'city_id',
+                'created_at',
+                'updated_at',
+            ],
+            "token",
+        ]
+
+
+    ] ;
 
     public function testRequiredFieldsForRegistration()
     {
@@ -38,6 +59,8 @@ class UserTest extends TestCase
                 "data" => Null,
             ]);
     }
+
+
     public function testRepeatPassword()
     {
         $userData = $this->getArrayUserData();
@@ -53,6 +76,8 @@ class UserTest extends TestCase
                 "data" => Null,
             ]);
     }
+
+
     public function testSuccessfulRegistration()
     {
         $userData = $this->getArrayUserData();
@@ -60,27 +85,7 @@ class UserTest extends TestCase
 
         $this->json('POST', 'api/register', $userData, ['Accept' => 'application/json'])
             ->assertStatus(201)
-            ->assertJsonStructure([
-                "status",
-                "message",
-                "data"=>[
-                    "user" => [
-                        'id',
-                        'name',
-                        'email',
-                        'address',
-                        'cellphone',
-                        'postal_code',
-                        'province_id',
-                        'city_id',
-                        'created_at',
-                        'updated_at',
-                    ],
-                    "token",
-                ]
-
-
-            ]);
+            ->assertJsonStructure($this->UserStructure);
     }
 
 
@@ -97,6 +102,8 @@ class UserTest extends TestCase
                 "data" => Null,
             ]);
     }
+
+
     public function testSuccessfulLogin()
     {
         $user = User::factory()->create();
@@ -106,27 +113,8 @@ class UserTest extends TestCase
 
         $this->json('POST', 'api/login', $loginData, ['Accept' => 'application/json'])
             ->assertStatus(200)
-            ->assertJsonStructure([
-                "status",
-                "message",
-                "data"=>[
-                    "user" => [
-                        'id',
-                        'name',
-                        'email',
-                        'address',
-                        'cellphone',
-                        'postal_code',
-                        'province_id',
-                        'city_id',
-                        'created_at',
-                        'updated_at',
-                    ],
-                    "token",
-                ]
+            ->assertJsonStructure($this->UserStructure);
 
-
-            ]);
 //        Sanctum::actingAs(
 //            $user
 //        );
@@ -134,11 +122,6 @@ class UserTest extends TestCase
 
 //        $this->assertAuthenticated();
     }
-
-
-
-
-
 
 
 
