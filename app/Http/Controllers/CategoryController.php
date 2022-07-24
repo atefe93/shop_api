@@ -6,6 +6,7 @@ use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends ApiController
@@ -100,6 +101,30 @@ class CategoryController extends ApiController
     public function products(Category $category){
 
         return $this->successResponse(new CategoryResource($category->load('products')),200);
+
+
+    }
+    public function redistest(){
+        $redis = Redis::connection();
+        $visits = Redis::incr('visits');
+        return $visits;
+    }
+    public function redistest1(){
+      //  Redis::del('categories.all');
+        if ($categories = Redis::get('categories.all')) {
+            return $categories;
+        }
+        $categories=Category::paginate(2);
+        return Redis::setex('categories.all', 60 * 60 * 24, $this->successResponse(([
+            'categories'=>CategoryResource::collection($categories),
+            'links'=>CategoryResource::collection($categories)->response()->getData()->links,
+            'meta'=>CategoryResource::collection($categories)->response()->getData()->meta
+        ])));
+
+
+
+
+
 
 
     }
