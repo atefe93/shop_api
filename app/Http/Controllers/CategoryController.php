@@ -105,7 +105,7 @@ class CategoryController extends ApiController
 
     }
     public function redistest(){
-        $redis = Redis::connection();
+     
         $visits = Redis::incr('visits');
         return $visits;
     }
@@ -115,11 +115,17 @@ class CategoryController extends ApiController
             return $categories;
         }
         $categories=Category::paginate(2);
-        return Redis::setex('categories.all', 60 * 60 * 24, $this->successResponse(([
+         Redis::setex('categories.all', 60 * 60 * 24, $this->successResponse(([
             'categories'=>CategoryResource::collection($categories),
             'links'=>CategoryResource::collection($categories)->response()->getData()->links,
             'meta'=>CategoryResource::collection($categories)->response()->getData()->meta
         ])));
+
+        return $this->successResponse(([
+            'categories'=>CategoryResource::collection($categories),
+            'links'=>CategoryResource::collection($categories)->response()->getData()->links,
+            'meta'=>CategoryResource::collection($categories)->response()->getData()->meta
+        ]));
 
 
 
